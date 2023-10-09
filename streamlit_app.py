@@ -106,10 +106,8 @@ if check_password():
     with col2:
         with st.container():
             st.subheader("Transverse Profile")
-            id_ = st.number_input("Transverse profile id", min_value=(segID-1)*900+1, max_value=segID*900, step = 1)
-            #with col12:
-            #    id_ = st.number_input("Transverse profile id", min_value=idmin, max_value=idmax, step = 1)
-            #    segID = id_//900+1
+            id_ = st.number_input("Transverse profile id", min_value=idmin, max_value=idmax, step = 1)
+
             # Extract transverse profile
             scanData_v1 = transExtrac(segData = data, id=id_)
             
