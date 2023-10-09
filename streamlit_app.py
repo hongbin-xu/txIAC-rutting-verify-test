@@ -33,16 +33,15 @@ def check_password():
         return True
 
 @st.cache_data
-def dataLoad(_conn, segID=None, idmin = None, idmax=None, mode = "1"):
+def dataLoad(_conn, segID=None, idmin = None, idmax=None):
     """
     mode1: select for each segment
     mode2: select for multiple segment
     creating 2d array of the height measurement
     """
-    if mode =="1":
-        data = conn.query('SELECT * from pathway_raw_fm365_sep13 WHERE segID =' + str(segID) +';')
-    if mode =="2":
-        data = conn.query('SELECT * from pathway_raw_fm365_sep13 WHERE id BETWEEN '+ str(idmin) +' AND ' + str(idmax)+';')
+    
+    data = conn.query('SELECT * from pathway_raw_fm365_sep13 ')# WHERE segID =' + str(segID) +';')
+
     st.write(data.columns)
     tranStep = data["tranStep"].mean()
     lonStep = data["lonStep"].mean()
@@ -107,8 +106,8 @@ if check_password():
                 data, tranStep, lonStep, dataArray = dataLoad(_conn=conn, idmin= idmin, idmax=idmax, mode ="2")
                 st.write(str(data["ROUTE_NAME"][0])+ ", DFO: "+str(data["DFO"].min())+ "~"+ str(data["DFO"].max()))
                 # plot surface
-                with st.container():
-                    surfPlot(data=data, dataArray=dataArray, tranStep=tranStep, lonStep=lonStep)
+                #with st.container():
+                #    surfPlot(data=data, dataArray=dataArray, tranStep=tranStep, lonStep=lonStep)
     with col2:
         with st.container():
             st.subheader("Transverse Profile")
