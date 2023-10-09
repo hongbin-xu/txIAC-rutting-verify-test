@@ -121,36 +121,39 @@ if check_password():
                 idmin = st.number_input("id start", min_value=1, max_value=90000-1, value = 1, step= 1)
             with col12:
                 idmax = st.number_input("id end", min_value=idmin, max_value=min(90000, idmin + 4499), value = idmin+50, step= 1)
-            with col11:
-                # Load data
-                if st.button("Load data"):
-                    dataLoad(_conn=conn, idmin= idmin, idmax=idmax)
-            with col12:
-                st.write(str(st.session_state.data["ROUTE_NAME"][0])+ ", DFO: "+str(st.session_state.data["DFO"].min())+ "~"+ str(st.session_state.data["DFO"].max()))
-            # plot surface
-            surfPlot(data=st.session_state.data)
 
-    with col2:
-        with st.container():
-            st.subheader("Transverse Profile")
-            id_ = st.number_input("Transverse profile", min_value=idmin, max_value=idmax, step = 1)
-            segID = id_//900+1
-            #if st.button("Update transverse profile"):
-            # Extract transverse profile
-            scanData_v1 = transExtrac(segData = st.session_state.data, id=id_, max_val = st.session_state.height_max)
+            # Load data
+            if st.button("Update"):
+                dataLoad(_conn=conn, idmin= idmin, idmax=idmax)
 
-            # View and download data
-            st.download_button(label="Download transverse profile", data=scanData_v1.to_csv().encode('utf-8'), file_name="transProfile_seg_" +str(segID)+"_scan_"+str(id_)+".csv", mime = "csv")
-
-        with st.container():
-            st.subheader("Longitudinal Profile")
-            id_x = st.number_input("Longitudinal profile", min_value=0, max_value=1536,value=0, step = 1)
-
-            # Extract transverse profile
-            scanData_v2 = lonExtrac(segData = st.session_state.data, id=id_x, max_val = st.session_state.height_max)
+            st.write(str(st.session_state.data["ROUTE_NAME"][0])+ ", DFO: "+str(st.session_state.data["DFO"].min())+ "~"+ str(st.session_state.data["DFO"].max()))
             
-            # View and download data
-            st.download_button(label="Download longitudinal profile", data=scanData_v2.to_csv().encode('utf-8'), file_name="lonProfile_" +str(id_x)+"_"+ str(idmin) +" to " + str(idmax)+ ".csv", mime = "csv")
+            if 'data' in st.session_state:
+                # plot surface
+                surfPlot(data=st.session_state.data)
+                
+    if 'data' in st.session_state:
+        with col2:
+            with st.container():
+                st.subheader("Transverse Profile")
+                id_ = st.number_input("Transverse profile", min_value=idmin, max_value=idmax, step = 1)
+                segID = id_//900+1
+                #if st.button("Update transverse profile"):
+                # Extract transverse profile
+                scanData_v1 = transExtrac(segData = st.session_state.data, id=id_, max_val = st.session_state.height_max)
+
+                # View and download data
+                st.download_button(label="Download transverse profile", data=scanData_v1.to_csv().encode('utf-8'), file_name="transProfile_seg_" +str(segID)+"_scan_"+str(id_)+".csv", mime = "csv")
+
+            with st.container():
+                st.subheader("Longitudinal Profile")
+                id_x = st.number_input("Longitudinal profile", min_value=0, max_value=1536,value=0, step = 1)
+
+                # Extract transverse profile
+                scanData_v2 = lonExtrac(segData = st.session_state.data, id=id_x, max_val = st.session_state.height_max)
+                
+                # View and download data
+                st.download_button(label="Download longitudinal profile", data=scanData_v2.to_csv().encode('utf-8'), file_name="lonProfile_" +str(id_x)+"_"+ str(idmin) +" to " + str(idmax)+ ".csv", mime = "csv")
 
     
     
