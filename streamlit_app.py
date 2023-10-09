@@ -63,7 +63,7 @@ def transExtrac(segData, id):
 
 @st.cache_data
 def lonExtrac(segData, id):
-    scanData = pd.DataFrame({"id": scanData["id"].values, "height":})
+    scanData = pd.DataFrame({"id": scanData["id"].values, "height": scanData[str(id)].values})
 
 
 @st.cache_data
