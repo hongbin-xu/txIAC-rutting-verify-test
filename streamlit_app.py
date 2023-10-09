@@ -66,8 +66,8 @@ def surfPlot(data, dataArray, tranStep, lonStep):
                         np.arange(dataArray.shape[1]).reshape(-1,dataArray.shape[1]).repeat(dataArray.shape[0], axis=0)*data["tranStep"].values.reshape(-1,1) # trans Distance 3
                         ], axis = -1)
     
-    fig = px.imshow(dataArray, origin = "lower", 
-                    labels = {"x": "Longitudinal profile id", "y": "Transverse profile id", "color": "Height (mm)"},
+    fig = px.imshow(dataArray, #origin = "lower", 
+                    labels = {"x": "Transverse id", "y": "Longitudinal id", "color": "Height (mm)"},
                     y = data["id"], #np.arange(dataArray.shape[0])*lonStep,
                     aspect="auto", 
                     height = 800)
@@ -136,9 +136,9 @@ if check_password():
 
             # View and download data
             st.download_button(label="Download profile", data=scanData_v1.to_csv().encode('utf-8'), file_name="transProfile_seg_" +str(segID)+"_scan_"+str(id_)+".csv", mime = "csv")
-            if st.checkbox('Show raw transverse profile data'):
+            if st.button('Show raw transverse profile data'):
                 st.write(scanData_v1)
         
-    
+            
     
     
