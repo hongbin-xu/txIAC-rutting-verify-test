@@ -101,7 +101,7 @@ if check_password():
                 idmax = st.number_input("id end", min_value=idmin, max_value=min(90000, idmin + 4499), value = idmin+50, step= 1)
             # Load data
             dataLoad(_conn=conn, idmin= idmin, idmax=idmax)
-            st.write(str(data["ROUTE_NAME"][0])+ ", DFO: "+str(data["DFO"].min())+ "~"+ str(data["DFO"].max()))
+            st.write(str(st.session_state.data["ROUTE_NAME"][0])+ ", DFO: "+str(st.session_state.data["DFO"].min())+ "~"+ str(st.session_state.data["DFO"].max()))
             # plot surface
             with st.container():
                 surfPlot(data=st.session_state.data, dataArray=st.session_state.dataArray)
