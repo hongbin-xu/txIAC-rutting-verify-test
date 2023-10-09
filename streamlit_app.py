@@ -131,11 +131,11 @@ if check_password():
             scanData_v1 = transExtrac(segData = st.session_state.data, id=id_)
             
             # Plot transverse profile
-            fig = px.line(scanData_v1, x="Height", labels = {"Height": "Height (mm}"}, template = "plotly_dark")
+            fig = px.line(scanData_v1, y="Height", labels = {"Height": "Height (mm}"}, template = "plotly_dark")
             st.plotly_chart(fig, use_container_width=True, theme = None)
 
             # View and download data
-            st.download_button(label="Download transverse profile", data=scanData_v1.to_csv().encode('utf-8'), file_name="transProfile_seg_" +str(segID)+"_scan_"+str(id_)+".csv", mime = "csv")
+            #st.download_button(label="Download transverse profile", data=scanData_v1.to_csv().encode('utf-8'), file_name="transProfile_seg_" +str(segID)+"_scan_"+str(id_)+".csv", mime = "csv")
             #if st.button('Show raw transverse profile data'):
             #    st.write(scanData_v1)
 
