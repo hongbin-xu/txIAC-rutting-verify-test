@@ -124,7 +124,6 @@ if check_password():
             # Load data
             if st.button("Update"):
                 st.session_state.data, st.session_state.height_max = dataLoad(_conn=conn, idmin= idmin, idmax=idmax)
-                st.write(st.session_state.data.head())
             
             if 'data' in st.session_state:
                 st.write(str(st.session_state.data["ROUTE_NAME"][0])+ ", DFO: "+str(st.session_state.data["DFO"].min())+ "~"+ str(st.session_state.data["DFO"].max()))
