@@ -87,36 +87,22 @@ if check_password():
     # Page title
     st.set_page_config(page_title='IAC-Rutting Verification', layout="wide")
     conn = st.experimental_connection("mysql", type="sql")
-
-    # sidebar
-    #with st.sidebar:
-    #    st.title("TxDOT Inter-Agency Contract")
-    #    st.subheader("Rutting Measurement Verification")
-    #    st.text("Maintenance Devision")
-    #    st.text("Presented by Hongbin Xu and Jorge Prozzi")
-    #    st.text("The University of Texas at Austin")
     
     # MySQL connection
     col1, col2 = st.columns(2, gap = "medium")
     with col1:
         with st.container():
             st.subheader("Suface")
-            if st.checkbox('Data for individual segment', value = True):
-                segID = st.number_input("Segment ID", min_value=1, max_value=100, step= 1) # Segment ID
-                data, tranStep, lonStep, dataArray = dataLoad(_conn=conn, segID=segID, mode = "1") # load data
-            else: 
-                st.write('Data for multiple segments (selection of excessive data may leads to slow processing)')
-                idmin = st.number_input("id start", min_value=1, max_value=90000-50, value = 1, step= 1)
-                idmax = st.number_input("id end", min_value=idmin, max_value=min(90000, idmin + 4499), value = idmin+50, step= 1)
-                # Load data
+            st.write('Select range of transverse profiles')
+            idmin = st.number_input("id start", min_value=1, max_value=90000-1, value = 1, step= 1)
+            idmax = st.number_input("id end", min_value=idmin, max_value=min(90000, idmin + 4499), value = idmin+50, step= 1)
+            # Load data
+            if st.button("Update surface plot"):
                 data, tranStep, lonStep, dataArray = dataLoad(_conn=conn, idmin= idmin, idmax=idmax, mode ="2")
-
-            st.write(str(data["ROUTE_NAME"][0])+ ", DFO: "+str(data["DFO"].min())+ "~"+ str(data["DFO"].max()))
-            # plot surface
-            with st.container():
-                if st.button("Update surface plot"):
+                st.write(str(data["ROUTE_NAME"][0])+ ", DFO: "+str(data["DFO"].min())+ "~"+ str(data["DFO"].max()))
+                # plot surface
+                with st.container():
                     surfPlot(data=data, dataArray=dataArray, tranStep=tranStep, lonStep=lonStep)
-
     with col2:
         with st.container():
             st.subheader("Transverse Profile")
