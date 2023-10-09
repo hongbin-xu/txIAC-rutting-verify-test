@@ -52,13 +52,12 @@ def dataLoad(_conn, segID=None, idmin = None, idmax=None):
     data[[str(i) for i in range(1536)]] = dataArray
     st.session_state.data = data
     del data
-    st.write(st.session_state.data)
 
 @st.cache_data
 def transExtrac(segData, id):
     # Extract transverse profile
     scanData = segData.loc[(segData["id"]==id), ["tranStep"]+ [str(i) for i in range(1536)]].reset_index(drop=True)
-    scanData_v1 = pd.DataFrame({"DIST":scanData["tranStep"][0]*np.arange(1536), "Height":scanData[[str(i) for i in range(1536)]].values})
+    scanData_v1 = pd.DataFrame({"DIST":scanData["tranStep"][0]*np.arange(1536), "Height":scanData[[str(i) for i in range(1536)]].values.flatten()})
     return scanData_v1
 
 @st.cache_data
