@@ -139,7 +139,7 @@ if check_password():
             st.plotly_chart(fig, use_container_width=True, theme = None)
 
             # View and download data
-            st.download_button(label="Download longitudinal profile", data=scanData_v2.to_csv().encode('utf-8'), file_name="lonProfile_" +tr(id_x)+"_"+ str(idmin) +" to " + str(idmax)+ ".csv", mime = "csv")
+            st.download_button(label="Download longitudinal profile", data=scanData_v2.to_csv().encode('utf-8'), file_name="lonProfile_" +str(id_x)+"_"+ str(idmin) +" to " + str(idmax)+ ".csv", mime = "csv")
 
     
     
