@@ -110,17 +110,18 @@ if check_password():
             st.subheader("Transverse Profile")
             id_ = st.number_input("Transverse profile id", min_value=idmin, max_value=idmax, step = 1)
             segID = id_//900+1
-            # Extract transverse profile
-            scanData_v1 = transExtrac(segData = data, id=id_)
-            
-            # Plot transverse profile
-            fig = px.line(scanData_v1, x="DIST", y="Height", labels = {"DIST": "Transverse OFFSET (mm)", "Height": "Height (mm}"}, template = "plotly_dark")
-            st.plotly_chart(fig)
+            if st.button("Update transverse profile"):
+                # Extract transverse profile
+                scanData_v1 = transExtrac(segData = data, id=id_)
+                
+                # Plot transverse profile
+                fig = px.line(scanData_v1, x="DIST", y="Height", labels = {"DIST": "Transverse OFFSET (mm)", "Height": "Height (mm}"}, template = "plotly_dark")
+                st.plotly_chart(fig)
 
-            # View and download data
-            st.download_button(label="Download transverse profile", data=scanData_v1.to_csv().encode('utf-8'), file_name="transProfile_seg_" +str(segID)+"_scan_"+str(id_)+".csv", mime = "csv")
-            #if st.button('Show raw transverse profile data'):
-            #    st.write(scanData_v1)
+                # View and download data
+                st.download_button(label="Download transverse profile", data=scanData_v1.to_csv().encode('utf-8'), file_name="transProfile_seg_" +str(segID)+"_scan_"+str(id_)+".csv", mime = "csv")
+                #if st.button('Show raw transverse profile data'):
+                #    st.write(scanData_v1)
         with st.container():
             st.subheader("Longitudinal Profile")
 
