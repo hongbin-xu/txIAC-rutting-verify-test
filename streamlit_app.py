@@ -43,10 +43,14 @@ def dataLoad(_conn, segID=None, idmin = None, idmax=None, mode = "1"):
         data = conn.query('SELECT * from pathway_raw_fm365_sep13 WHERE segID =' + str(segID) +';')
     if mode =="2":
         data = conn.query('SELECT * from pathway_raw_fm365_sep13 WHERE id BETWEEN '+ str(idmin) +' AND ' + str(idmax)+';')
+    st.write(data.columns)
     tranStep = data["tranStep"].mean()
     lonStep = data["lonStep"].mean()
     dataArray = np.array([np.array(data["height"][i].split(b',')).astype("float") for i in range(data.shape[0])])
-    
+    st.session_state.data = data
+    st.session_state.tranStep = tranStep
+    st.session_state.lonStep = lonStep
+    st.session_state.dataArray = dataArray
     return data, tranStep, lonStep, dataArray
 
 @st.cache_data
