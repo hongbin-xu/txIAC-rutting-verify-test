@@ -51,23 +51,24 @@ def dataLoad(_conn, segID=None, idmin = None, idmax=None):
     data = data.drop(columns = "height")
     data[[str(i) for i in range(1536)]] = dataArray
     st.session_state.data = data
-    st.session_state.dataArray = dataArray
+    del data
     st.write(st.session_state.data)
 
 @st.cache_data
 def transExtrac(segData, id):
     # Extract transverse profile
-    scanData = segData.loc[(segData["id"]==id), ["tranStep", "height"]].reset_index(drop=True)
-    scanData_v1 = pd.DataFrame({"DIST":scanData["tranStep"][0]*np.arange(1536), "Height":np.array(scanData["height"][0].split(b",")).astype("float")})
+    scanData = segData.loc[(segData["id"]==id), ["tranStep"]+ [str(i) for i in range(1536)]].reset_index(drop=True)
+    scanData_v1 = pd.DataFrame({"DIST":scanData["tranStep"][0]*np.arange(1536), "Height":scanData[[str(i) for i in range(1536)]].values})
     return scanData_v1
 
 @st.cache_data
 def lonExtrac(segData, id):
-    scanData = pd.DataFrame({"id": scanData["id"].values, "height": scanData[str(id)].values})
-
+    scanData = segData[["id", "OFFSET", str(id)]].rename(columns = {str(id): "Height"})
+    return scanData
 
 @st.cache_data
-def surfPlot(data, dataArray):
+def surfPlot(data):
+    dataArray = data[[str(i) for i in range(1536)]]
     # hover information
     # id, segID, scanID, dataNum, DFO + mm, transverse mm
     customData= np.stack([data["segID"].values.reshape(dataArray.shape[0],-1).repeat(dataArray.shape[1], axis =1), # SegID 0
@@ -109,7 +110,7 @@ if check_password():
             dataLoad(_conn=conn, idmin= idmin, idmax=idmax)
             st.write(str(st.session_state.data["ROUTE_NAME"][0])+ ", DFO: "+str(st.session_state.data["DFO"].min())+ "~"+ str(st.session_state.data["DFO"].max()))
             # plot surface
-            surfPlot(data=st.session_state.data, dataArray=st.session_state.dataArray)
+            surfPlot(data=st.session_state.data)
 
     with col2:
         with st.container():
