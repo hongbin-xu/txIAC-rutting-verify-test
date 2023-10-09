@@ -3,6 +3,12 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 
+st.set_page_config(layout="wide", 
+                   page_title='IAC-Rutting Verification',
+                   menu_items={
+                       'Get help': "mailto:hongbinxu@utexas.edu",
+                       'About': "Developed and maintained by Hongbin Xu"})
+
 # Authentication function
 def check_password():
     """Returns `True` if the user had a correct password."""
@@ -58,11 +64,18 @@ def transExtrac(segData, id):
     # Extract transverse profile
     scanData = segData.loc[(segData["id"]==id), ["tranStep"]+ [str(i) for i in range(1536)]].reset_index(drop=True)
     scanData_v1 = pd.DataFrame({"DIST":scanData["tranStep"][0]*np.arange(1536), "Height":scanData[[str(i) for i in range(1536)]].values.flatten()})
+
+    # Plot transverse profile
+    fig = px.line(scanData_v1, x="DIST", y="Height", labels = {"DIST": "Transverse OFFSET (mm)", "Height": "Height (mm}"}, template = "plotly_dark")
+    st.plotly_chart(fig, use_container_width=True, theme = None)
     return scanData_v1
 
 @st.cache_data
 def lonExtrac(segData, id):
     scanData = segData[["id", "OFFSET", str(id)]].rename(columns = {str(id): "Height"})
+                # Plot transverse profile
+    fig = px.line(scanData, x ="id", y="Height", labels = {"id": "Longitudinal id","Height": "Height (mm}"}, template = "plotly_dark")
+    st.plotly_chart(fig, use_container_width=True, theme = None)
     return scanData
 
 @st.cache_data
@@ -92,7 +105,6 @@ def surfPlot(data):
 # Check authentication
 if check_password():    
     # Page title
-    st.set_page_config(page_title='IAC-Rutting Verification', layout="wide")
     conn = st.experimental_connection("mysql", type="sql")
     
     # MySQL connection
@@ -122,10 +134,6 @@ if check_password():
             #if st.button("Update transverse profile"):
             # Extract transverse profile
             scanData_v1 = transExtrac(segData = st.session_state.data, id=id_)
-            
-            # Plot transverse profile
-            fig = px.line(scanData_v1, x="DIST", y="Height", labels = {"DIST": "Transverse OFFSET (mm)", "Height": "Height (mm}"}, template = "plotly_dark")
-            st.plotly_chart(fig, use_container_width=True, theme = None)
 
             # View and download data
             st.download_button(label="Download transverse profile", data=scanData_v1.to_csv().encode('utf-8'), file_name="transProfile_seg_" +str(segID)+"_scan_"+str(id_)+".csv", mime = "csv")
@@ -137,10 +145,6 @@ if check_password():
             # Extract transverse profile
             scanData_v2 = lonExtrac(segData = st.session_state.data, id=id_x)
             
-            # Plot transverse profile
-            fig = px.line(scanData_v2, x ="id", y="Height", labels = {"id": "Longitudinal id","Height": "Height (mm}"}, template = "plotly_dark")
-            st.plotly_chart(fig, use_container_width=True, theme = None)
-
             # View and download data
             st.download_button(label="Download longitudinal profile", data=scanData_v2.to_csv().encode('utf-8'), file_name="lonProfile_" +str(id_x)+"_"+ str(idmin) +" to " + str(idmax)+ ".csv", mime = "csv")
 
