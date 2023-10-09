@@ -94,11 +94,11 @@ if check_password():
         with st.container():
             st.subheader("Suface")
             st.write('Select range of transverse profiles')
-            idmin = st.number_input("id start", min_value=1, max_value=90000-1, value = 1, step= 1)
-            idmax = st.number_input("id end", min_value=idmin, max_value=min(90000, idmin + 4499), value = idmin+50, step= 1)
+            idRange = st.slider('Select range of transverse profiles', min_value1, max_value = 90000, value = (1, 900), step =1)
+            
             # Load data
             if st.button("Update surface plot"):
-                data, tranStep, lonStep, dataArray = dataLoad(_conn=conn, idmin= idmin, idmax=idmax, mode ="2")
+                data, tranStep, lonStep, dataArray = dataLoad(_conn=conn, idmin= idRange[0], idmax=idRange[1], mode ="2")
                 st.write(str(data["ROUTE_NAME"][0])+ ", DFO: "+str(data["DFO"].min())+ "~"+ str(data["DFO"].max()))
                 # plot surface
                 with st.container():
@@ -106,8 +106,8 @@ if check_password():
     with col2:
         with st.container():
             st.subheader("Transverse Profile")
-            id_ = st.number_input("Transverse profile id", min_value=idmin, max_value=idmax, step = 1)
-
+            id_ = st.number_input("Transverse profile id", min_value=idRange[0], max_value=idRange[1], step = 1)
+            segID = id_//900+1
             # Extract transverse profile
             scanData_v1 = transExtrac(segData = data, id=id_)
             
