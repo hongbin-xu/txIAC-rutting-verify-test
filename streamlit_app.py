@@ -58,7 +58,6 @@ def dataLoad(_conn, segID=None, idmin = None, idmax=None):
     data[[str(i) for i in range(1536)]] = dataArray
     st.session_state.data = data
     st.session_state.height_max = max(dataArray.max(axis=0))
-    st.write(dataArray.max())
     del data, dataArray
 
 @st.cache_data
