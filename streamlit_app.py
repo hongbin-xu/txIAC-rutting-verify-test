@@ -79,7 +79,7 @@ def surfPlot(data):
                     labels = {"x": "Transverse id", "y": "Longitudinal id", "color": "Height (mm)"},
                     y = data["id"], #np.arange(dataArray.shape[0])*lonStep,
                     aspect="auto", 
-                    height = 800)
+                    height = 900)
 
     fig.update(data=[{'customdata': customData,
                       'hovertemplate': "<br>".join(["id: %{y:.0f}", "segID: %{customdata[0]:.0f}", "DFO: %{customdata[1]:.3f} mile",
