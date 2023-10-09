@@ -94,7 +94,7 @@ if check_password():
         with st.container():
             st.subheader("Suface")
             st.write('Select range of transverse profiles')
-            idRange = st.slider('Select range of transverse profiles', min_value1, max_value = 90000, value = (1, 900), step =1)
+            idRange = st.slider('Select range of transverse profiles', min_value=1, max_value = 90000, value = (1, 900), step =1)
             
             # Load data
             if st.button("Update surface plot"):
