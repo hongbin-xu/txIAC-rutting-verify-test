@@ -106,7 +106,8 @@ if check_password():
             with col12:
                 idmax = st.number_input("id end", min_value=idmin, max_value=min(90000, idmin + 4499), value = idmin+50, step= 1)
             # Load data
-            dataLoad(_conn=conn, idmin= idmin, idmax=idmax)
+            if st.button("Load data"):
+                dataLoad(_conn=conn, idmin= idmin, idmax=idmax)
             st.write(str(st.session_state.data["ROUTE_NAME"][0])+ ", DFO: "+str(st.session_state.data["DFO"].min())+ "~"+ str(st.session_state.data["DFO"].max()))
             # plot surface
             surfPlot(data=st.session_state.data)
@@ -135,7 +136,7 @@ if check_password():
             scanData_v2 = lonExtrac(segData = st.session_state.data, id=id_x)
             
             # Plot transverse profile
-            fig = px.line(scanData_v2, x ="id", y="Height", labels = {"id": "Longitudinal id","Height": "Height (mm}"}, template = "plotly_dark")
+            fig = px.line(scanData_v2, x ="id", y="Height", labels = {"id": "Transverse id","Height": "Height (mm}"}, template = "plotly_dark")
             st.plotly_chart(fig, use_container_width=True, theme = None)
 
             # View and download data
