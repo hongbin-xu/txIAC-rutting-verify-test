@@ -5,28 +5,35 @@ import plotly.express as px
 
 # Authentication function
 def check_password():
-    """Returns `True` if the user had the correct password."""
+    """Returns `True` if the user had a correct password."""
 
     def password_entered():
         """Checks whether a password entered by the user is correct."""
-        if st.session_state["password"] == st.secrets["password"]:
+        if (
+            st.session_state["username"] in st.secrets["passwords"]
+            and st.session_state["password"]
+            == st.secrets["passwords"][st.session_state["username"]]
+        ):
             st.session_state["password_correct"] = True
-            del st.session_state["password"]  # don't store password
+            del st.session_state["password"]  # don't store username + password
+            del st.session_state["username"]
         else:
             st.session_state["password_correct"] = False
 
     if "password_correct" not in st.session_state:
-        # First run, show input for password.
+        # First run, show inputs for username + password.
+        st.text_input("Username", on_change=password_entered, key="username")
         st.text_input(
             "Password", type="password", on_change=password_entered, key="password"
         )
         return False
     elif not st.session_state["password_correct"]:
         # Password not correct, show input + error.
+        st.text_input("Username", on_change=password_entered, key="username")
         st.text_input(
             "Password", type="password", on_change=password_entered, key="password"
         )
-        st.error("😕 Password incorrect")
+        st.error("😕 User not known or password incorrect")
         return False
     else:
         # Password correct.
@@ -39,9 +46,7 @@ def dataLoad(_conn, segID=None, idmin = None, idmax=None):
     mode2: select for multiple segment
     creating 2d array of the height measurement
     """
-    
-    data = conn.query('SELECT * from pathway_raw_fm365_sep13 ')# WHERE segID =' + str(segID) +';')
-
+    data = conn.query('SELECT * from pathway_raw_fm365_sep13 WHERE id BETWEEN '+ str(idmin) +' AND ' + str(idmax)+';')
     st.write(data.columns)
     tranStep = data["tranStep"].mean()
     lonStep = data["lonStep"].mean()
@@ -103,11 +108,11 @@ if check_password():
                 idmax = st.number_input("id end", min_value=idmin, max_value=min(90000, idmin + 4499), value = idmin+50, step= 1)
             # Load data
             if st.button("Update surface plot"):
-                data, tranStep, lonStep, dataArray = dataLoad(_conn=conn, idmin= idmin, idmax=idmax)
+                data, tranStep, lonStep, dataArray = dataLoad(_conn=conn, idmin= idmin, idmax=idmax, mode ="2")
                 st.write(str(data["ROUTE_NAME"][0])+ ", DFO: "+str(data["DFO"].min())+ "~"+ str(data["DFO"].max()))
                 # plot surface
-                #with st.container():
-                #    surfPlot(data=data, dataArray=dataArray, tranStep=tranStep, lonStep=lonStep)
+                with st.container():
+                    surfPlot(data=data, dataArray=dataArray, tranStep=tranStep, lonStep=lonStep)
     with col2:
         with st.container():
             st.subheader("Transverse Profile")
