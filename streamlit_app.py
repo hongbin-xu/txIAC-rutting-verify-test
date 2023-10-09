@@ -129,18 +129,17 @@ if check_password():
 
         with st.container():
             st.subheader("Longitudinal Profile")
-            id_x = st.number_input("Longitudinal profile", min_value=idmin, max_value=idmax, step = 1)
-            segID = id_//900+1
-            #if st.button("Update transverse profile"):
+            id_x = st.number_input("Longitudinal profile", min_value=0, max_value=1536,value=0, step = 1)
+
             # Extract transverse profile
-            scanData_v1 = transExtrac(segData = st.session_state.data, id=id_)
+            scanData_v2 = lonExtrac(segData = st.session_state.data, id=id_x)
             
             # Plot transverse profile
-            fig = px.line(scanData_v1, x ="id", y="Height", labels = {"id": "Longitudinal id","Height": "Height (mm}"}, template = "plotly_dark")
+            fig = px.line(scanData_v2, x ="id", y="Height", labels = {"id": "Longitudinal id","Height": "Height (mm}"}, template = "plotly_dark")
             st.plotly_chart(fig, use_container_width=True, theme = None)
 
             # View and download data
-            st.download_button(label="Download longitudinal profile", data=scanData_v1.to_csv().encode('utf-8'), file_name="lonProfile_" +tr(id_x)+"_"+ str(idmin) +" to " + str(idmax)+ ".csv", mime = "csv")
+            st.download_button(label="Download longitudinal profile", data=scanData_v2.to_csv().encode('utf-8'), file_name="lonProfile_" +tr(id_x)+"_"+ str(idmin) +" to " + str(idmax)+ ".csv", mime = "csv")
 
     
     
