@@ -80,7 +80,7 @@ def lonExtrac(segData, id, max_val):
     fig = px.line(scanData, x ="id", y="Height", labels = {"id": "Longitudinal id","Height": "Height (mm}"}, template = "plotly_dark")
     #fig.update_layout(yaxis_range=[0,max_val])
     fig.layout.yaxis.range = [0,max_val]
-    st.line_chart(data = scanData, x = "id", y = "height", use_container_width=True)
+    st.line_chart(data = scanData, x = "id", y = "Height", use_container_width=True)
     return scanData
 
 @st.cache_data
