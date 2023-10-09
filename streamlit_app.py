@@ -112,7 +112,7 @@ if check_password():
                 st.write(str(data["ROUTE_NAME"][0])+ ", DFO: "+str(data["DFO"].min())+ "~"+ str(data["DFO"].max()))
                 # plot surface
                 with st.container():
-                    surfPlot(data=data, dataArray=dataArray, tranStep=tranStep, lonStep=lonStep)
+                    surfPlot(data=st.session_state.data, dataArray=st.session_state.dataArray, tranStep=st.session_state.tranStep, lonStep=st.session_state.lonStep)
     with col2:
         with st.container():
             st.subheader("Transverse Profile")
@@ -120,7 +120,7 @@ if check_password():
             segID = id_//900+1
             #if st.button("Update transverse profile"):
             # Extract transverse profile
-            scanData_v1 = transExtrac(segData = data, id=id_)
+            scanData_v1 = transExtrac(segData = st.session_state.data, id=id_)
             
             # Plot transverse profile
             fig = px.line(scanData_v1, x="DIST", y="Height", labels = {"DIST": "Transverse OFFSET (mm)", "Height": "Height (mm}"}, template = "plotly_dark")
