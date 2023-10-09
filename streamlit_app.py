@@ -66,7 +66,7 @@ def surfPlot(data, dataArray, tranStep, lonStep):
                         np.arange(dataArray.shape[1]).reshape(-1,dataArray.shape[1]).repeat(dataArray.shape[0], axis=0)*data["tranStep"].values.reshape(-1,1) # trans Distance 3
                         ], axis = -1)
     
-    fig = px.imshow(dataArray, #origin = "lower", 
+    fig = px.imshow(dataArray, origin = "lower", 
                     labels = {"x": "Transverse id", "y": "Longitudinal id", "color": "Height (mm)"},
                     y = data["id"], #np.arange(dataArray.shape[0])*lonStep,
                     aspect="auto", 
@@ -75,10 +75,11 @@ def surfPlot(data, dataArray, tranStep, lonStep):
                       'hovertemplate': "<br>".join(["id: %{y:.0f}",
                                                     "segID: %{customdata[0]:.0f}",
                                                     "DFO: %{customdata[1]:.3f} mile",
-                                                    "OFFSET: %{customdata[2]:.0f} mm",
-                                                    "lonID: %{x:.0f}",
-                                                    "transDist: %{customdata[3]:.0f} mm",
+                                                    "lonOFFSET: %{customdata[2]:.0f} mm",
+                                                    "transID: %{x:.0f}",
+                                                    "transOFFSET: %{customdata[3]:.0f} mm",
                                                     "Height: %{z} mm"])}])
+    fig['layout']['xaxis']['autorange'] = "reversed"
     st.plotly_chart(fig, use_container_width=True, theme = None)
 
 # Check authentication
@@ -121,7 +122,8 @@ if check_password():
             st.write(str(data["ROUTE_NAME"][0])+ ", DFO: "+str(data["DFO"].min())+ "~"+ str(data["DFO"].max()))
             # plot surface
             with st.container():
-                surfPlot(data=data, dataArray=dataArray, tranStep=tranStep, lonStep=lonStep)
+                if st.button("Update surface plot"):
+                    surfPlot(data=data, dataArray=dataArray, tranStep=tranStep, lonStep=lonStep)
 
     with col2:
         with st.container():
@@ -131,14 +133,15 @@ if check_password():
             scanData_v1 = transExtrac(segData = data, id=id_)
             
             # Plot transverse profile
-            fig = px.line(scanData_v1, x="DIST", y="Height", labels = {"DIST": "Transverse Distance (mm)", "Height": "Height (mm}"}, template = "plotly_dark")
+            fig = px.line(scanData_v1, x="DIST", y="Height", labels = {"DIST": "Transverse OFFSET (mm)", "Height": "Height (mm}"}, template = "plotly_dark")
             st.plotly_chart(fig)
 
             # View and download data
-            st.download_button(label="Download profile", data=scanData_v1.to_csv().encode('utf-8'), file_name="transProfile_seg_" +str(segID)+"_scan_"+str(id_)+".csv", mime = "csv")
-            if st.button('Show raw transverse profile data'):
-                st.write(scanData_v1)
-        
-            
+            st.download_button(label="Download transverse profile", data=scanData_v1.to_csv().encode('utf-8'), file_name="transProfile_seg_" +str(segID)+"_scan_"+str(id_)+".csv", mime = "csv")
+            #if st.button('Show raw transverse profile data'):
+            #    st.write(scanData_v1)
+        with st.container():
+            st.subheader("Longitudinal Profile")
+
     
     
