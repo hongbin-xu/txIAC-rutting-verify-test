@@ -48,8 +48,11 @@ def dataLoad(_conn, segID=None, idmin = None, idmax=None):
     """
     data = conn.query('SELECT * from pathway_raw_fm365_sep13 WHERE id BETWEEN '+ str(idmin) +' AND ' + str(idmax)+';')
     dataArray = np.array([np.array(data["height"][i].split(b',')).astype("float") for i in range(data.shape[0])])
+    data = data.drop(columns = "height")
+    data[[str(i) for i in range(1536)]] = dataArray
     st.session_state.data = data
     st.session_state.dataArray = dataArray
+    st.write(st.session_state.data)
 
 @st.cache_data
 def transExtrac(segData, id):
@@ -59,14 +62,18 @@ def transExtrac(segData, id):
     return scanData_v1
 
 @st.cache_data
+def lonExtrac(segData, id):
+    scanData = pd.DataFrame({"id": scanData["id"].values, "height":})
+
+
+@st.cache_data
 def surfPlot(data, dataArray):
     # hover information
     # id, segID, scanID, dataNum, DFO + mm, transverse mm
     customData= np.stack([data["segID"].values.reshape(dataArray.shape[0],-1).repeat(dataArray.shape[1], axis =1), # SegID 0
-                        data["DFO"].values.reshape(dataArray.shape[0],-1).repeat(dataArray.shape[1], axis =1), # DFO 1
-                        data["OFFSET"].values.reshape(dataArray.shape[0],-1).repeat(dataArray.shape[1], axis =1), # DFO offset 2
-                        np.arange(dataArray.shape[1]).reshape(-1,dataArray.shape[1]).repeat(dataArray.shape[0], axis=0)*data["tranStep"].values.reshape(-1,1) # trans Distance 3
-                        ], axis = -1)
+                         data["DFO"].values.reshape(dataArray.shape[0],-1).repeat(dataArray.shape[1], axis =1), # DFO 1
+                         data["OFFSET"].values.reshape(dataArray.shape[0],-1).repeat(dataArray.shape[1], axis =1), # DFO offset 2
+                         np.arange(dataArray.shape[1]).reshape(-1,dataArray.shape[1]).repeat(dataArray.shape[0], axis=0)*data["tranStep"].values.reshape(-1,1)], axis = -1)
     
     fig = px.imshow(dataArray, origin = "lower", 
                     labels = {"x": "Transverse id", "y": "Longitudinal id", "color": "Height (mm)"},
@@ -80,7 +87,6 @@ def surfPlot(data, dataArray):
                                                     "transOFFSET: %{customdata[3]:.0f} mm","Height: %{z} mm"])}])
 
     fig['layout']['xaxis']['autorange'] = "reversed"
-    
     st.plotly_chart(fig, use_container_width=True, theme = None)
 
 # Check authentication
@@ -103,8 +109,8 @@ if check_password():
             dataLoad(_conn=conn, idmin= idmin, idmax=idmax)
             st.write(str(st.session_state.data["ROUTE_NAME"][0])+ ", DFO: "+str(st.session_state.data["DFO"].min())+ "~"+ str(st.session_state.data["DFO"].max()))
             # plot surface
-            with st.container():
-                surfPlot(data=st.session_state.data, dataArray=st.session_state.dataArray)
+            surfPlot(data=st.session_state.data, dataArray=st.session_state.dataArray)
+
     with col2:
         with st.container():
             st.subheader("Transverse Profile")
@@ -120,8 +126,7 @@ if check_password():
 
             # View and download data
             st.download_button(label="Download transverse profile", data=scanData_v1.to_csv().encode('utf-8'), file_name="transProfile_seg_" +str(segID)+"_scan_"+str(id_)+".csv", mime = "csv")
-            #if st.button('Show raw transverse profile data'):
-            #    st.write(scanData_v1)
+
         with st.container():
             st.subheader("Longitudinal Profile")
             id_x = st.number_input("Longitudinal profile", min_value=idmin, max_value=idmax, step = 1)
@@ -135,9 +140,7 @@ if check_password():
             st.plotly_chart(fig, use_container_width=True, theme = None)
 
             # View and download data
-            #st.download_button(label="Download transverse profile", data=scanData_v1.to_csv().encode('utf-8'), file_name="transProfile_seg_" +str(segID)+"_scan_"+str(id_)+".csv", mime = "csv")
-            #if st.button('Show raw transverse profile data'):
-            #    st.write(scanData_v1)
+            st.download_button(label="Download longitudinal profile", data=scanData_v1.to_csv().encode('utf-8'), file_name="lonProfile_" +tr(id_x)+"_"+ str(idmin) +" to " + str(idmax)+ ".csv", mime = "csv")
 
     
     
