@@ -47,15 +47,11 @@ def dataLoad(_conn, segID=None, idmin = None, idmax=None):
     creating 2d array of the height measurement
     """
     data = conn.query('SELECT * from pathway_raw_fm365_sep13 WHERE id BETWEEN '+ str(idmin) +' AND ' + str(idmax)+';')
-    st.write(data.columns)
-    tranStep = data["tranStep"].mean()
-    lonStep = data["lonStep"].mean()
     dataArray = np.array([np.array(data["height"][i].split(b',')).astype("float") for i in range(data.shape[0])])
     st.session_state.data = data
     st.session_state.tranStep = tranStep
     st.session_state.lonStep = lonStep
     st.session_state.dataArray = dataArray
-    return data, tranStep, lonStep, dataArray
 
 @st.cache_data
 def transExtrac(segData, id):
@@ -65,7 +61,7 @@ def transExtrac(segData, id):
     return scanData_v1
 
 @st.cache_data
-def surfPlot(data, dataArray, tranStep, lonStep):
+def surfPlot(data, dataArray):
     # hover information
     # id, segID, scanID, dataNum, DFO + mm, transverse mm
     customData= np.stack([data["segID"].values.reshape(dataArray.shape[0],-1).repeat(dataArray.shape[1], axis =1), # SegID 0
@@ -79,15 +75,14 @@ def surfPlot(data, dataArray, tranStep, lonStep):
                     y = data["id"], #np.arange(dataArray.shape[0])*lonStep,
                     aspect="auto", 
                     height = 800)
+
     fig.update(data=[{'customdata': customData,
-                      'hovertemplate': "<br>".join(["id: %{y:.0f}",
-                                                    "segID: %{customdata[0]:.0f}",
-                                                    "DFO: %{customdata[1]:.3f} mile",
-                                                    "lonOFFSET: %{customdata[2]:.0f} mm",
-                                                    "transID: %{x:.0f}",
-                                                    "transOFFSET: %{customdata[3]:.0f} mm",
-                                                    "Height: %{z} mm"])}])
+                      'hovertemplate': "<br>".join(["id: %{y:.0f}", "segID: %{customdata[0]:.0f}", "DFO: %{customdata[1]:.3f} mile",
+                                                    "lonOFFSET: %{customdata[2]:.0f} mm", "transID: %{x:.0f}",
+                                                    "transOFFSET: %{customdata[3]:.0f} mm","Height: %{z} mm"])}])
+
     fig['layout']['xaxis']['autorange'] = "reversed"
+    
     st.plotly_chart(fig, use_container_width=True, theme = None)
 
 # Check authentication
@@ -107,12 +102,11 @@ if check_password():
             with col12:
                 idmax = st.number_input("id end", min_value=idmin, max_value=min(90000, idmin + 4499), value = idmin+50, step= 1)
             # Load data
-            if st.button("Update surface plot"):
-                data, tranStep, lonStep, dataArray = dataLoad(_conn=conn, idmin= idmin, idmax=idmax)
-                st.write(str(data["ROUTE_NAME"][0])+ ", DFO: "+str(data["DFO"].min())+ "~"+ str(data["DFO"].max()))
-                # plot surface
-                with st.container():
-                    surfPlot(data=st.session_state.data, dataArray=st.session_state.dataArray, tranStep=st.session_state.tranStep, lonStep=st.session_state.lonStep)
+            data, tranStep, lonStep, dataArray = dataLoad(_conn=conn, idmin= idmin, idmax=idmax)
+            st.write(str(data["ROUTE_NAME"][0])+ ", DFO: "+str(data["DFO"].min())+ "~"+ str(data["DFO"].max()))
+            # plot surface
+            with st.container():
+                surfPlot(data=st.session_state.data, dataArray=st.session_state.dataArray)
     with col2:
         with st.container():
             st.subheader("Transverse Profile")
