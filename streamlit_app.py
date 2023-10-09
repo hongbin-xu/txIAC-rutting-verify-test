@@ -57,24 +57,27 @@ def dataLoad(_conn, segID=None, idmin = None, idmax=None):
     data = data.drop(columns = "height")
     data[[str(i) for i in range(1536)]] = dataArray
     st.session_state.data = data
-    del data
+    st.session_state.height_max = max(dataArray.max(axis=0))
+    del data, dataArray
 
 @st.cache_data
-def transExtrac(segData, id):
+def transExtrac(segData, id, max_val):
     # Extract transverse profile
     scanData = segData.loc[(segData["id"]==id), ["tranStep"]+ [str(i) for i in range(1536)]].reset_index(drop=True)
     scanData_v1 = pd.DataFrame({"DIST":scanData["tranStep"][0]*np.arange(1536), "Height":scanData[[str(i) for i in range(1536)]].values.flatten()})
 
     # Plot transverse profile
     fig = px.line(scanData_v1, x="DIST", y="Height", labels = {"DIST": "Transverse OFFSET (mm)", "Height": "Height (mm}"}, template = "plotly_dark")
+    fig.update_layout(yaxis_range=[0,max_val])
     st.plotly_chart(fig, use_container_width=True, theme = None)
     return scanData_v1
 
 @st.cache_data
-def lonExtrac(segData, id):
+def lonExtrac(segData, id, max_val):
     scanData = segData[["id", "OFFSET", str(id)]].rename(columns = {str(id): "Height"})
                 # Plot transverse profile
     fig = px.line(scanData, x ="id", y="Height", labels = {"id": "Longitudinal id","Height": "Height (mm}"}, template = "plotly_dark")
+    fig.update_layout(yaxis_range=[0,max_val])
     st.plotly_chart(fig, use_container_width=True, theme = None)
     return scanData
 
@@ -133,7 +136,7 @@ if check_password():
             segID = id_//900+1
             #if st.button("Update transverse profile"):
             # Extract transverse profile
-            scanData_v1 = transExtrac(segData = st.session_state.data, id=id_)
+            scanData_v1 = transExtrac(segData = st.session_state.data, id=id_, max_val = st.session_state.height_max)
 
             # View and download data
             st.download_button(label="Download transverse profile", data=scanData_v1.to_csv().encode('utf-8'), file_name="transProfile_seg_" +str(segID)+"_scan_"+str(id_)+".csv", mime = "csv")
@@ -143,7 +146,7 @@ if check_password():
             id_x = st.number_input("Longitudinal profile", min_value=0, max_value=1536,value=0, step = 1)
 
             # Extract transverse profile
-            scanData_v2 = lonExtrac(segData = st.session_state.data, id=id_x)
+            scanData_v2 = lonExtrac(segData = st.session_state.data, id=id_x, max_val = st.session_state.height_max)
             
             # View and download data
             st.download_button(label="Download longitudinal profile", data=scanData_v2.to_csv().encode('utf-8'), file_name="lonProfile_" +str(id_x)+"_"+ str(idmin) +" to " + str(idmax)+ ".csv", mime = "csv")
