@@ -49,8 +49,6 @@ def dataLoad(_conn, segID=None, idmin = None, idmax=None):
     data = conn.query('SELECT * from pathway_raw_fm365_sep13 WHERE id BETWEEN '+ str(idmin) +' AND ' + str(idmax)+';')
     dataArray = np.array([np.array(data["height"][i].split(b',')).astype("float") for i in range(data.shape[0])])
     st.session_state.data = data
-    st.session_state.tranStep = tranStep
-    st.session_state.lonStep = lonStep
     st.session_state.dataArray = dataArray
 
 @st.cache_data
