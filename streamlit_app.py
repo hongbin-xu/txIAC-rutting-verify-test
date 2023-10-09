@@ -56,9 +56,9 @@ def dataLoad(_conn, segID=None, idmin = None, idmax=None):
     dataArray = np.array([np.array(data["height"][i].split(b',')).astype("float") for i in range(data.shape[0])])
     data = data.drop(columns = "height")
     data[[str(i) for i in range(1536)]] = dataArray
-    st.session_state.data = data
-    st.session_state.height_max = max(dataArray.max(axis=0))
-    del data, dataArray
+    height_max = data
+    del dataArray
+    return data, height_max
 
 @st.cache_data
 def transExtrac(segData, id, max_val):
@@ -123,7 +123,7 @@ if check_password():
 
             # Load data
             if st.button("Update"):
-                dataLoad(_conn=conn, idmin= idmin, idmax=idmax)
+                st.session_state.data, st.session_state.height_max = dataLoad(_conn=conn, idmin= idmin, idmax=idmax)
                 st.write(st.session_state.data.head())
             
             if 'data' in st.session_state:
