@@ -68,7 +68,8 @@ def transExtrac(segData, id, max_val):
 
     # Plot transverse profile
     fig = px.line(scanData_v1, x="DIST", y="Height", labels = {"DIST": "Transverse OFFSET (mm)", "Height": "Height (mm}"}, template = "plotly_dark")
-    fig.update_layout(yaxis_range=[0,max_val])
+    #fig.update_layout(yaxis_range=[0,max_val])
+    fig.layout.yaxis.range = [0,max_val]
     st.plotly_chart(fig, use_container_width=True, theme = None)
     return scanData_v1
 
@@ -77,7 +78,8 @@ def lonExtrac(segData, id, max_val):
     scanData = segData[["id", "OFFSET", str(id)]].rename(columns = {str(id): "Height"})
                 # Plot transverse profile
     fig = px.line(scanData, x ="id", y="Height", labels = {"id": "Longitudinal id","Height": "Height (mm}"}, template = "plotly_dark")
-    fig.update_layout(yaxis_range=[0,max_val])
+    #fig.update_layout(yaxis_range=[0,max_val])
+    fig.layout.yaxis.range = [0,max_val]
     st.plotly_chart(fig, use_container_width=True, theme = None)
     return scanData
 
